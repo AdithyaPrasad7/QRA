@@ -41,7 +41,7 @@ def decode_qr_code(image):
         return "There was some error"
 
 st.set_page_config(layout='wide')
-st.markdown("<h1 style='text-align: center; color: red;top: -70px;left: 300px;position: absolute;'>Welcome to QR code Generator</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: red;'>Welcome to QR code Generator</h1>", unsafe_allow_html=True)
 
 page1,page2=st.tabs(["Generate QR Code","Decode QR Code"])
 with page1:
