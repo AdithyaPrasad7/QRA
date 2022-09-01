@@ -40,23 +40,30 @@ st.set_page_config(layout='wide')
 st.markdown("<h1 style='text-align: center; color: red;'>Welcome to QR code Generator</h1>", unsafe_allow_html=True)
 
 page1,page2=st.tabs(["Generate QR Code","Decode QR Code"])
+
 with page1:
     with st.form(key="encode"):
         data = st.text_area('Enter the data:-')
         st.text(data)
-        t1,t2=st.columns(2)
-        with t1:
-            colour1 = st.color_picker('Pick A Background Colour',key="fill_colour",value='#000000')
-            st.write('Preferred colour:-Black  #000000')
-        with t2:
-            colour2 = st.color_picker('Pick A Painting  Colour',key="back_colour",value='#FFFFFF')
-            st.write('Preferred colour:-White  #FFFFFF')
 
+        t1,t2=st.columns(2)
+
+        with t1:
+            colour1 = st.color_picker('Pick A Painting  Colour',key="fill_colour",value='#000000')
+            st.write('Preferred colour:-Black  #000000')
+            st.write('Ensure Painting Colour to be Dark Colour compared to Background  Colour')
+
+        with t2:
+            colour2 = st.color_picker('Pick A Background Colour',key="back_colour",value='#FFFFFF')
+            st.write('Preferred colour:-White  #FFFFFF')
+            st.write('Ensure Background Colour to be Light Colour compared to Painting  Colour')
         
         submit=st.form_submit_button("Generate  QR Code")
+
     if submit:
         img_path=qr_code_generator(data,colour1,colour2)
         img=Image.open(img_path)
+
         with open(img_path,"rb") as file:
             dwn=st.download_button(
                 label="Download Image",
@@ -64,6 +71,7 @@ with page1:
                 file_name=img_path,
                 mime="image/png"
             )
+
         st.image(img)
         
 
@@ -76,6 +84,7 @@ with page2:
         if submit:
             text=decode_qr_code(img)
             p1,p2=st.columns(2)
+            
             with p1:
                 st.image(img)
 
@@ -83,5 +92,6 @@ with page2:
                 st.info("Decoded Text from Image is:-")
                 st.text(text)
 
-            
+       
+
 
