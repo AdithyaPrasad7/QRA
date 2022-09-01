@@ -20,13 +20,9 @@ def qr_code_generator(s,colour1,colour2):
 
     img = qr.make_image(fill_color=colour1, back_color=colour2)
     path=os.getcwd()
-    print(path)
     current_time = time.strftime("%H-%M-%S")
-    print(current_time)
     file_name='qr_image_'+current_time+'_.png'
-    print(file_name)
     save_img=os.path.join(path,file_name)
-    print(save_img)
     img.save(save_img)
     return save_img
 
@@ -47,7 +43,7 @@ page1,page2=st.tabs(["Generate QR Code","Decode QR Code"])
 with page1:
     with st.form(key="encode"):
         data = st.text_area('Enter the data:-')
-        st.write(data)
+        st.text(data)
         t1,t2=st.columns(2)
         with t1:
             colour1 = st.color_picker('Pick A Background Colour',key="fill_colour",value='#000000')
@@ -85,7 +81,7 @@ with page2:
 
             with p2:
                 st.info("Decoded Text from Image is:-")
-                st.info(text)
+                st.text(text)
 
             
 
