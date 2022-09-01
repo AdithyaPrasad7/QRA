@@ -57,11 +57,19 @@ with page1:
             st.write('Preferred colour:-White  #FFFFFF')
 
         
-        submit=st.form_submit_button("Generate qr code")
+        submit=st.form_submit_button("Generate  QR Code")
     if submit:
         img_path=qr_code_generator(data,colour1,colour2)
         img=Image.open(img_path)
+        with open(img_path,"rb") as file:
+            dwn=st.download_button(
+                label="Download Image",
+                data=file,
+                file_name=img_path,
+                mime="image/png"
+            )
         st.image(img)
+        
 
 with page2:
      with st.form(key="decode"):
