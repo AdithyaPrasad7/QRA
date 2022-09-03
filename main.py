@@ -5,6 +5,7 @@ import numpy as np
 import time
 from PIL import Image
 import cv2
+import webbrowser
 
 qr = qrcode.QRCode(
         version=1,
@@ -12,7 +13,26 @@ qr = qrcode.QRCode(
         box_size=10,
         border=4,
     )
-
+def dynamic_cam():
+    cam=cv2.VideoCapture(0)
+    detector=cv2.QRCodeDetector()
+    while True:
+        _,img=cam.read()
+        data,bbox,_=detector.detectAndDecode(img)
+        if data:
+            s=data
+            break
+        cv2.imshow("QRCODEscanner", img)   
+        if cv2.waitKey(1) == ord("q"):
+            break
+    
+    b=webbrowser.open(str(s))
+    cam.release()
+    cv2.destroyAllWindows()
+    if s:
+        return s
+    else:
+        return "Error scan again!"
 def qr_code_generator(s,colour1,colour2):
     
     qr.add_data(s)
@@ -39,7 +59,7 @@ def decode_qr_code(image):
 st.set_page_config(layout='wide')
 st.markdown("<h1 style='text-align: center; color: red;'>Welcome to QR code Generator</h1>", unsafe_allow_html=True)
 
-page1,page2=st.tabs(["Generate QR Code","Decode QR Code"])
+page1,page2,page3=st.tabs(["Generate QR Code","Decode QR Code","Scan"])
 
 with page1:
     with st.form(key="encode"):
@@ -84,7 +104,7 @@ with page2:
         if submit:
             text=decode_qr_code(img)
             p1,p2=st.columns(2)
-            
+
             with p1:
                 st.image(img)
 
@@ -92,6 +112,14 @@ with page2:
                 st.info("Decoded Text from Image is:-")
                 st.text(text)
 
-       
+with page3:
+    st.markdown("""### Some controls for the WebCam Window
+    - q - Quit""")
+    if st.button('Open Webcam and Scan'):
+        s=dynamic_cam()
+        if s is not None:
+            st.write(s)
 
+
+            
 
