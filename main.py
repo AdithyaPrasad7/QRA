@@ -14,6 +14,7 @@ qr = qrcode.QRCode(
         border=4,
     )
 def dynamic_cam():
+    os.popen(f'sudo /sbin/ldconfig -v')
     cam=cv2.VideoCapture(0)
     detector=cv2.QRCodeDetector()
     while True:
