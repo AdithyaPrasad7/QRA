@@ -5,43 +5,43 @@ import numpy as np
 import time
 from PIL import Image
 import cv2
-import webbrowser
+import PIL.Image as Image
+from io import BytesIO
 
-qr = qrcode.QRCode(
+qr=qrcode.QRCode(
         version=1,
         error_correction=qrcode.constants.ERROR_CORRECT_L,
         box_size=10,
         border=4,
     )
-def dynamic_cam():
-    os.popen(f'sudo /sbin/ldconfig -v')
-    cam=cv2.VideoCapture(0)
+
+def toggle_widget():
+    if st.session_state.widget_disabled:
+        st.session_state.widget_disabled = False
+    else:
+        st.session_state.widget_disabled = True  
+
+if 'widget_disabled' not in st.session_state:
+    st.session_state.widget_disabled = True
+
+def dynamic_cam(img_file_buffer):
     detector=cv2.QRCodeDetector()
-    while True:
-        _,img=cam.read()
-        data,bbox,_=detector.detectAndDecode(img)
-        if data:
-            s=data
-            break
-        cv2.imshow("QRCODEscanner", img)   
-        if cv2.waitKey(1) == ord("q"):
-            break
-    
-    b=webbrowser.open(str(s))
-    cam.release()
-    cv2.destroyAllWindows()
-    if s:
-        return s
+    imqg=Image.open(file_name)
+    img=np.asarray(imqg)
+    data,bbox,_=detector.detectAndDecode(img)
+    if data:
+        return data
     else:
         return "Error scan again!"
+
 def qr_code_generator(s,colour1,colour2):
     
     qr.add_data(s)
     qr.make(fit=True)
 
-    img = qr.make_image(fill_color=colour1, back_color=colour2)
+    img=qr.make_image(fill_color=colour1, back_color=colour2)
     path=os.getcwd()
-    current_time = time.strftime("%H-%M-%S")
+    current_time=time.strftime("%H-%M-%S")
     file_name='qr_image_'+current_time+'_.png'
     save_img=os.path.join(path,file_name)
     img.save(save_img)
@@ -64,18 +64,18 @@ page1,page2,page3=st.tabs(["Generate QR Code","Decode QR Code","Scan"])
 
 with page1:
     with st.form(key="encode"):
-        data = st.text_area('Enter the data:-')
+        data=st.text_area('Enter the data:-')
         st.text(data)
 
         t1,t2=st.columns(2)
 
         with t1:
-            colour1 = st.color_picker('Pick A Painting  Colour',key="fill_colour",value='#000000')
+            colour1=st.color_picker('Pick A Painting  Colour',key="fill_colour",value='#000000')
             st.write('Preferred colour:-Black  #000000')
             st.write('Ensure Painting Colour to be Dark Colour compared to Background  Colour')
 
         with t2:
-            colour2 = st.color_picker('Pick A Background Colour',key="back_colour",value='#FFFFFF')
+            colour2=st.color_picker('Pick A Background Colour',key="back_colour",value='#FFFFFF')
             st.write('Preferred colour:-White  #FFFFFF')
             st.write('Ensure Background Colour to be Light Colour compared to Painting  Colour')
         
@@ -114,13 +114,26 @@ with page2:
                 st.text(text)
 
 with page3:
-    st.markdown("""### Some controls for the WebCam Window
-    - q - Quit""")
-    if st.button('Open Webcam and Scan'):
-        s=dynamic_cam()
-        if s is not None:
-            st.write(s)
+    st.button('Scan',on_click=toggle_widget)
+    img_file_buffer=st.camera_input("Scan the QR Code",disabled=st.session_state.widget_disabled,key =7)
 
+    current_time=time.strftime("%H-%M-%S")
+    file_name='qr_code_'+current_time+'_.png'
 
-            
+    if img_file_buffer is not None:
+        bytes_data=img_file_buffer.getvalue()
+        stream=BytesIO(bytes_data)
+        image=Image.open(stream).convert("RGBA")
+        stream.close()
+        im1=image.save(file_name)
+
+        s=dynamic_cam(file_name)
+        t3,t4=st.columns(2)
+
+        with t3:
+            st.image(file_name)
+        with t4:
+            if s is not None:
+                st.info(s)
+
 
